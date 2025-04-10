@@ -1,0 +1,32 @@
+Application Flow (Based on User Story):
+Here is the typical flow derived from the user story document:
+
+Login: A Branch User or Help Desk User logs into the portal using their credentials (AHBS ID for Branch User).   
+
+Dashboard View: Upon login, the user sees a dashboard summarizing leads by status (e.g., Total Assigned Leads, Convert to Client, Under Follow up, New Leads). These dashboard sections likely link to relevant views/actions.   
+
+Lead Generation (Branch User):
+A Branch User initiates lead generation for either NTB (New To Bank) or ETB (Existing To Bank) customers.
+For ETB leads, selecting "Existing Customer" in Lead Avenue displays the Account Number and Account Title fields.   
+The user fills in the detailed customer information, including the newly added fields like Customer Type, Visit Purpose, Persons Met, Classification, etc., using dropdowns (LOVs) where applicable.   
+The user can Save the lead (remains editable by the user) or Save & Submit. Both actions make the lead visible in reports for both user roles.   
+
+Activity Management (Branch User):
+The Branch User can select a lead (e.g., from the dashboard or a search) to view its details and record activities.   
+The user records the Activity Date time (cannot be past/future), Activity description, Action Result, and updates the Lead Status.   
+
+Status-Specific Actions:
+Converted to Client: User must enter the Opened_Account_Number and the system fetches/validates the Account_Title. Comments are required.   
+Under Follow-up: User must select a Next Action (Call, Email, Visit), set a Next Follow up Date Time (future date allowed), and add comments.   
+Closed: User must select a reason from the Close Remarks LOV and provide details in the reasoning field.   
+
+Printing Visit Report: From the activity screen for a selected lead, the user has an option to print the captured lead/customer information.   
+
+Reporting (Branch User & Help Desk User):
+Both user roles can access a reporting section to view and download lead data.   
+Reports include the newly added customer information fields.   
+Downloads are available in Excel and PDF formats.   
+
+Date filters have restrictions: generally only the previous 30 days, but for "Under Follow-up" status, users can also search up to 30 days in the future.   
+
+Help Desk User Functions: This role primarily focuses on viewing the dashboard and generating/viewing reports. They do not perform lead generation or activity logging. 
