@@ -2,107 +2,109 @@
 
 -- Create Branches Table
 CREATE TABLE Branches (
-    Branch_ID INT PRIMARY KEY NOT NULL,
-    Branch_Name VARCHAR(100),
-    Branch_Code INT,
-    Location VARCHAR(255)
+    Branch_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Branch_Name VARCHAR(100) NOT NULL,
+    Branch_Code INT NOT NULL UNIQUE,
+    Location VARCHAR(255) NOT NULL
 );
 
 -- Create Roles Table
 CREATE TABLE Roles (
-    Role_ID INT PRIMARY KEY NOT NULL,
-    Role VARCHAR(50)
+    Role_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Role VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- Create Users Table
 CREATE TABLE Users (
-    User_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
-    Username VARCHAR(50),
-    Role_ID INT,
-    Branch_ID INT,
-    Password_Hash VARCHAR(255),
-    Created_Date TIMESTAMP,
-    Last_Login TIMESTAMP,
-    PRIMARY KEY (User_ID),
+    User_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Username VARCHAR(50) NOT NULL UNIQUE,
+    Role_ID INT NOT NULL,
+    Branch_ID INT NOT NULL,
+    Password_Hash VARCHAR(255) NOT NULL,
+    Created_Date TIMESTAMP NOT NULL,
+    Last_Login TIMESTAMP, 
     FOREIGN KEY (Role_ID) REFERENCES Roles(Role_ID),
     FOREIGN KEY (Branch_ID) REFERENCES Branches(Branch_ID)
 );
 
 -- Create Reports Table
 CREATE TABLE Reports (
-    Report_ID INT PRIMARY KEY NOT NULL,
-    User_ID INT,
-    Report_Name VARCHAR(255),
-    Report_Type VARCHAR(255),
-    Report_Parameters VARCHAR(255),
-    Generated_Date_Time TIMESTAMP,
-    File_Path VARCHAR(255),
-    File_Format VARCHAR(255),
+    Report_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    User_ID INT NOT NULL,
+    Report_Name VARCHAR(255) NOT NULL,
+    Report_Type VARCHAR(255) NOT NULL,
+    Report_Parameters VARCHAR(255), 
+    Generated_Date_Time TIMESTAMP NOT NULL,
+    File_Path VARCHAR(255) NOT NULL, 
+    File_Format VARCHAR(255) NOT NULL,
     FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
 );
 
 -- Create Accounts Table
 CREATE TABLE Accounts (
     Account_Number VARCHAR(20) PRIMARY KEY NOT NULL,
-    Account_Title VARCHAR(255)
+    Account_Title VARCHAR(255) NOT NULL,
+    CONSTRAINT chk_account_number_length CHECK (LENGTH(Account_Number) = 17)
 );
 
--- Create Supporting LOV Tables
+-- Create Supporting LOV Tables (TypeofBusiness, CustomerType, Category, VisitPurpose, PersonVisitingFromBank, CustomerClassification)
+
 CREATE TABLE CustomerTypeofBusiness (
-    TypeofBusiness_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    TypeofBusiness_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     TypeofBusiness_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE CustomerType (
-    CustomerType_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    CustomerType_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     CustomerType_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE CustomerCategory (
-    Category_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Category_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Category_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE VisitPurpose (
-    Purpose_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Purpose_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Purpose_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE PersonVisitingFromBank (
-    Person_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Person_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Person_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE CustomerClassification (
-    Classification_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Classification_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Classification_Value VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- Create Customers Table
 CREATE TABLE Customers (
-    Customer_ID INT PRIMARY KEY NOT NULL,
-    Customer_Name VARCHAR(100),
-    Account_Number VARCHAR(20),
-    Contact_Number VARCHAR(21),
-    Address VARCHAR(255),
-    Created_Date TIMESTAMP,
-    TypeofBusiness_ID INT,
-    CustomerType_ID INT,
-    Industry_Sector VARCHAR(100),
-    Category_ID INT,
-    Purpose_ID INT,
-    Key_Persons_met VARCHAR(250),
-    Person_ID INT,
-    Date_Time_of_Visit TIMESTAMP,
-    Customer_Currently_Banking_with VARCHAR(100),
-    Nature_of_Facilities_with_other_Banks VARCHAR(100),
-    Address_of_Premises_Visited VARCHAR(250),
-    Classification_ID INT,
-    Next_Visit_Assigned_Department VARCHAR(100),
-    Next_Visit_Assigned_Department_s_Official_Name VARCHAR(100),
-    Key_Supplier VARCHAR(250),
-    Key_Buyers VARCHAR(250),
-    Personal_Leads VARCHAR(250),
+    Customer_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Customer_Name VARCHAR(100) NOT NULL,
+    Account_Number VARCHAR(20) NOT NULL UNIQUE, 
+    Contact_Number VARCHAR(21) NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    Created_Date TIMESTAMP NOT NULL,
+    TypeofBusiness_ID INT NOT NULL,
+    CustomerType_ID INT NOT NULL,
+    Industry_Sector VARCHAR(100) NOT NULL,
+    Category_ID INT NOT NULL,
+    Purpose_ID INT NOT NULL, 
+    Key_Persons_met VARCHAR(250) NOT NULL,
+    Person_ID INT NOT NULL,
+    Date_Time_of_Visit TIMESTAMP NOT NULL, 
+    Customer_Currently_Banking_with VARCHAR(100) NOT NULL,
+    Nature_of_Facilities_with_other_Banks VARCHAR(100) NOT NULL,
+    Address_of_Premises_Visited VARCHAR(250) NOT NULL,
+    Classification_ID INT NOT NULL,
+    Next_Visit_Assigned_Department VARCHAR(100) NOT NULL,
+    Next_Visit_Assigned_Department_s_Official_Name VARCHAR(100) NOT NULL,
+    Key_Supplier VARCHAR(250) NOT NULL,
+    Key_Buyers VARCHAR(250) NOT NULL,
+    Personal_Leads VARCHAR(250) NOT NULL,
+    Visit_Summary VARCHAR(500),
     FOREIGN KEY (Account_Number) REFERENCES Accounts(Account_Number),
     FOREIGN KEY (TypeofBusiness_ID) REFERENCES CustomerTypeofBusiness(TypeofBusiness_ID),
     FOREIGN KEY (CustomerType_ID) REFERENCES CustomerType(CustomerType_ID),
@@ -113,34 +115,37 @@ CREATE TABLE Customers (
 );
 
 -- Create Supporting Lookup Tables for Leads and Activities
+
 CREATE TABLE CloseRemarksLookup (
-    Remarks_ID INT PRIMARY KEY NOT NULL,
-    Remarks VARCHAR(255)
+    Remarks_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Remarks VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE LeadStatusLookup (
-    Status_ID INT PRIMARY KEY NOT NULL,
-    Status_Name VARCHAR(255)
+    Status_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Status_Name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE NextActionLookup (
-    Next_Action_ID INT PRIMARY KEY NOT NULL,
-    Next_Action_Name VARCHAR(255)
+    Next_Action_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Next_Action_Name VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- Create Leads Table
 CREATE TABLE Leads (
-    Lead_ID INT PRIMARY KEY NOT NULL,
-    Customer_ID INT,
-    Branch_ID INT,
-    Lead_Avenue VARCHAR(50),
-    Status_ID INT,
-    User_ID INT,
-    Created_Date TIMESTAMP,
-    Submitted_Date TIMESTAMP,
+    Lead_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Customer_ID INT NOT NULL,
+    Branch_ID INT NOT NULL,
+    Lead_Avenue VARCHAR(50) NOT NULL, 
+    Status_ID INT NOT NULL,
+    User_ID INT NOT NULL,
+    Created_Date TIMESTAMP NOT NULL,
+    Submitted_Date TIMESTAMP, 
     Remarks_ID INT,
+    Closed_Reasoning VARCHAR(255),
     Comment_Details VARCHAR(255),
-    Opened_Account_Number VARCHAR(20),
-    Opened_Account_Title VARCHAR(100),
+    Opened_Account_Number VARCHAR(20), 
+    Opened_Account_Title VARCHAR(100), 
     FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
     FOREIGN KEY (Branch_ID) REFERENCES Branches(Branch_ID),
     FOREIGN KEY (User_ID) REFERENCES Users(User_ID),
@@ -148,17 +153,18 @@ CREATE TABLE Leads (
     FOREIGN KEY (Remarks_ID) REFERENCES CloseRemarksLookup(Remarks_ID)
 );
 
+-- Create Activities Table
 CREATE TABLE Activities (
-    Activity_ID INT PRIMARY KEY NOT NULL,
-    Lead_ID INT,
-    Activity_DateTime TIMESTAMP,
-    Activity VARCHAR(255),
-    Action_Result VARCHAR(100),
-    New_Lead_Status VARCHAR(50),
-    Next_Action_ID INT,
-    Next_Follow_Up_DateTime TIMESTAMP,
+    Activity_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Lead_ID INT NOT NULL,
+    Activity_DateTime TIMESTAMP NOT NULL,
+    Activity VARCHAR(255) NOT NULL,
+    Action_Result VARCHAR(100) NOT NULL,
+    New_Lead_Status VARCHAR(50) NOT NULL, 
+    Next_Action_ID INT, 
+    Next_Follow_Up_DateTime TIMESTAMP, 
     Comment_Details VARCHAR(255),
-    Created_Date TIMESTAMP,
+    Created_Date TIMESTAMP NOT NULL,
     FOREIGN KEY (Lead_ID) REFERENCES Leads(Lead_ID),
     FOREIGN KEY (Next_Action_ID) REFERENCES NextActionLookup(Next_Action_ID)
 );
@@ -166,128 +172,158 @@ CREATE TABLE Activities (
 
 ---------------------------------- Insert ----------------------------------
 
-
 -- Populate Branches Table
-INSERT INTO Branches (Branch_ID, Branch_Name, Branch_Code, Location) VALUES
-(5001, 'Shahrah-e-Faisal Islamic', 5001, 'Shahrah-e-Faisal'),
-(786, 'Karachi Main', 786, 'I.I Chundrigar'),
-(1001, 'North Islamic Branch', 1001, 'North Nazimabad'),
-(2001, 'Help Desk', 2001, 'CenterPoint');
+INSERT INTO Branches (Branch_Name, Branch_Code, Location) VALUES
+('Shahrah-e-Faisal Islamic', 5001, 'Shahrah-e-Faisal'),
+('Karachi Main', 786, 'I.I Chundrigar'),
+('North Islamic Branch', 1001, 'North Nazimabad'),
+('CenterPoint', 2001, 'Shaheed-e-Millat Expressway');
 
 -- Populate Roles Table
-INSERT INTO Roles (Role_ID, Role) VALUES 
-(1, 'Branch User'),
-(2, 'Help Desk');
+INSERT INTO Roles (Role) VALUES
+('Branch User'),
+('Help Desk');
 
 -- Populate Users Table
 INSERT INTO Users (Username, Role_ID, Branch_ID, Password_Hash, Created_Date, Last_Login) VALUES
-('Jari', 1, 5001, 'hashed_password_1', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
-('Basit', 1, 786, 'hashed_password_2', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
-('Ahmed', 2, 2001, 'hashed_password_3', CURRENT TIMESTAMP, CURRENT TIMESTAMP);
+('Jari', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001), 'hashed_password_1', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Basit', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 786), 'hashed_password_2', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Ahmed', (SELECT Role_ID FROM Roles WHERE Role = 'Help Desk'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 2001), 'hashed_password_3', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Saqib', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001), '$2a$10$cG9cwRNnaHMRcculaHQ67ea0iPd9FmRCDl2NmmlkLQAIFV8OzOLfG', CURRENT TIMESTAMP, CURRENT TIMESTAMP);
 
-INSERT INTO Users (Username, Role_ID, Branch_ID, Password_Hash, Created_Date, Last_Login) VALUES
-('Saqib', 1, 5001, '$2a$10$cG9cwRNnaHMRcculaHQ67ea0iPd9FmRCDl2NmmlkLQAIFV8OzOLfG', CURRENT TIMESTAMP, CURRENT TIMESTAMP)
-
--- Populate Reports Table
-INSERT INTO Reports (Report_ID, User_ID, Report_Name, Report_Type, Report_Parameters, Generated_Date_Time, File_Path, File_Format)
-VALUES (61, 10, 'Customer Visit Report', 'PDF', 'Param1', CURRENT TIMESTAMP, '/files/report1.pdf', 'PDF'),
-       (62, 10, 'Customer Visit Report', 'Excel', 'Param2', CURRENT TIMESTAMP, '/files/report2.xlsx', 'Excel'),
-       (63, 30, 'Customer Visit Report', 'PDF','Param3', CURRENT TIMESTAMP, '/files/report3.csv', 'PDF');
+-- Populate Accounts Table
+INSERT INTO Accounts (Account_Number, Account_Title) VALUES
+('12345001123456789', 'Alpha Trading Co.'),
+('98765001987654321', 'Beta Manufacturing Inc.'),
+('11223786112233445', 'Gamma Services Ltd.'),
+('55667100111223344', 'Delta Wholesalers'); -- Added another account for closed lead example
 
 -- Populate Lookup Tables
+
 INSERT INTO CustomerTypeofBusiness (TypeofBusiness_Value) VALUES
-('Wholesaler'),
-('Manufacturer'),
-('Local Trader'),
-('Foreign Trader - Importer'),
-('Foreign Trader - Exporter'),
-('Retailer'),
-('Services'),
-('Other');
+('Wholesaler'), ('Manufacturer'), ('Local Trader'), ('Foreign Trader - Importer'),
+('Foreign Trader - Exporter'), ('Retailer'), ('Services'), ('Other');
 
 INSERT INTO CustomerType (CustomerType_Value) VALUES
-('Retail - NTB'),
-('SME - NTB'),
-('Commercial - NTB'),
-('Corporate - NTB'),
-('Retail - ETB'),
-('SME - ETB'),
-('Commercial - ETB'),
-('Corporate - ETB');
+('Retail - NTB'), ('SME - NTB'), ('Commercial - NTB'), ('Corporate - NTB'),
+('Retail - ETB'), ('SME - ETB'), ('Commercial - ETB'), ('Corporate - ETB');
 
 INSERT INTO CustomerCategory (Category_Value) VALUES
-('Individual'),
-('Sole Proprietor'),
-('Partnership'),
-('Company'),
-('Other');
+('Individual'), ('Sole Proprietor'), ('Partnership'), ('Company'), ('Other');
 
 INSERT INTO VisitPurpose (Purpose_Value) VALUES
-('Customer Request'),
-('To Enhance Business'),
-('Courtesy Call'),
-('Follow-up meeting'),
-('Meeting with senior executives');
+('Customer Request'), ('To Enhance Business'), ('Courtesy Call'),
+('Follow-up meeting'), ('Meeting with senior executives');
 
 INSERT INTO PersonVisitingFromBank (Person_Value) VALUES
-('Zonal Head'),
-('Zonal Head & Area Chief'),
-('Zonal Head, Area Chief & Area Manager'),
-('Zonal Head & Area Manager'),
-('Zonal Head & Area Manager, Credit'),
-('Zonal Head & Area Manager, Trade'),
-('Zonal Head, Area Chief, Area Manager & Branch Manager'),
-('Zonal Head, Area Manager & Branch Manager'),
-('Area Manager & Branch Manager'),
-('Branch Manager & Credit'),
-('Branch Manager & Trade'),
-('Branch Manager & Leasing'),
-('Branch Manager & Agriculture'),
-('Branch Manager & Consumer'),
-('Branch Manager & Cash Management'),
-('Branch Manager & Employee Banking'),
-('Branch Manager & Relationship Manager'),
-('Branch Manager, Relationship Manager & BDO'),
-('Branch Manager & BDO'),
-('Branch Manager');
+('Zonal Head'), ('Zonal Head & Area Chief'), ('Zonal Head, Area Chief & Area Manager'),
+('Zonal Head & Area Manager'), ('Zonal Head & Area Manager, Credit'), ('Zonal Head & Area Manager, Trade'),
+('Zonal Head, Area Chief, Area Manager & Branch Manager'), ('Zonal Head, Area Manager & Branch Manager'),
+('Area Manager & Branch Manager'), ('Branch Manager & Credit'), ('Branch Manager & Trade'),
+('Branch Manager & Leasing'), ('Branch Manager & Agriculture'), ('Branch Manager & Consumer'),
+('Branch Manager & Cash Management'), ('Branch Manager & Employee Banking'), ('Branch Manager & Relationship Manager'),
+('Branch Manager, Relationship Manager & BDO'), ('Branch Manager & BDO'), ('Branch Manager');
 
 INSERT INTO CustomerClassification (Classification_Value) VALUES
-('Deposit'),
-('Financing'),
-('Trade'),
-('Deposit, Financing'),
-('Deposit, Financing, Trade'),
-('Financing, Trade'),
-('Deposit, Trade');
+('Deposit'), ('Financing'), ('Trade'), ('Deposit, Financing'),
+('Deposit, Financing, Trade'), ('Financing, Trade'), ('Deposit, Trade');
+
+INSERT INTO CloseRemarksLookup (Remarks) VALUES
+('Account Opened'), ('Not Interested'), ('Duplicate Lead'), ('Non-Contactable');
+
+INSERT INTO LeadStatusLookup (Status_Name) VALUES
+('New'), ('In Progress'), ('Follow-up Required'), ('Closed - Won'), ('Closed - Lost');
+
+INSERT INTO NextActionLookup (Next_Action_Name) VALUES
+('Call Customer'), ('Schedule Meeting'), ('Send Proposal'), ('Internal Follow-up'), ('Close Lead');
+
+-- Populate Customers Table 
+INSERT INTO Customers (Customer_Name, Account_Number, Contact_Number, Address, Created_Date, TypeofBusiness_ID, CustomerType_ID, Industry_Sector, Category_ID, Purpose_ID, Key_Persons_met, Person_ID, Date_Time_of_Visit, Customer_Currently_Banking_with, Nature_of_Facilities_with_other_Banks, Address_of_Premises_Visited, Classification_ID, Next_Visit_Assigned_Department, Next_Visit_Assigned_Department_s_Official_Name, Key_Supplier, Key_Buyers, Personal_Leads, Visit_Summary) VALUES
+('Alpha Trading Co.', '12345001123456789', '0300-1234567', '123 Main St, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Local Trader'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'SME - ETB'), 'Textiles', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Partnership'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'To Enhance Business'), 'Mr. Usman (CEO)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Area Manager & Branch Manager'), CURRENT TIMESTAMP - 10 DAYS, 'Bank XYZ', 'Running Finance', '123 Main St, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing, Trade'), 'SME', 'Area Manager SME', 'Supplier A', 'Buyer X', 'Lead from Conf. A', 'Discussed potential trade facility enhancement. Positive outlook.'),
+('Beta Manufacturing Inc.', '98765001987654321', '0321-9876543', '456 Industrial Zone, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Manufacturer'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - ETB'), 'Pharmaceuticals', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Follow-up meeting'), 'Ms. Aisha (Director)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & Relationship Manager'), CURRENT TIMESTAMP - 12 DAYS, 'Bank ABC', 'Term Loan', '456 Industrial Zone, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit, Financing, Trade'), 'Corporate', 'Relationship Manager Corp', 'Supplier B', 'Buyer Y', 'Referral from Client B', NULL),
+('Gamma Services Ltd.', '11223786112233445', '0333-1122334', '789 Business Ave, Clifton', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Services'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Corporate - ETB'), 'IT Services', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Customer Request'), 'Mr. Bilal (Owner)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager'), CURRENT TIMESTAMP - 13 DAYS, 'Bank DEF', 'None', '789 Business Ave, Clifton', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit'), 'Retail', 'Branch Manager', 'Supplier C', 'Buyer Z', 'Internal Lead Gen', 'Initial meeting request fulfilled. Explored deposit products.'),
+('Delta Wholesalers', '55667100111223344', '0311-5556677', '10 Warehouse Ln, SITE Area', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Wholesaler'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - NTB'), 'General Goods', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Sole Proprietor'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Courtesy Call'), 'Mr. Dawood (Proprietor)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & BDO'), CURRENT TIMESTAMP - 15 DAYS, 'Bank GHI', 'Cash Finance', '10 Warehouse Ln, SITE Area', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing'), 'Commercial', 'RM Commercial', 'Supplier D', 'Buyer W', 'Walk-in', 'Met proprietor, initial discussion.');
+
+-- Populate Leads Table
+INSERT INTO Leads (Customer_ID, Branch_ID, Lead_Avenue, Status_ID, User_ID, Created_Date, Submitted_Date, Remarks_ID, Closed_Reasoning, Comment_Details, Opened_Account_Number, Opened_Account_Title) VALUES
+( (SELECT Customer_ID FROM Customers WHERE Account_Number = '12345001123456789'), -- Customer: Alpha Trading
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001),
+  'Referral',
+  (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'Follow-up Required'), -- Status: Follow-up Required
+  (SELECT User_ID FROM Users WHERE Username = 'Jari'),
+  CURRENT TIMESTAMP - 5 DAYS,
+  CURRENT TIMESTAMP - 4 DAYS,
+  NULL, -- Remarks_ID (still open)
+  NULL, -- Closed_Reasoning (still open)
+  'Proposal sent, awaiting feedback.',
+  NULL, NULL),
+( (SELECT Customer_ID FROM Customers WHERE Account_Number = '98765001987654321'), -- Customer: Beta Manufacturing
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 786),
+  'Cold Call',
+  (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'In Progress'), -- Status: In Progress
+  (SELECT User_ID FROM Users WHERE Username = 'Basit'),
+  CURRENT TIMESTAMP - 8 DAYS,
+  CURRENT TIMESTAMP - 7 DAYS,
+  NULL,
+  NULL,
+  'Meeting held, evaluating requirements.',
+  NULL, NULL),
+( (SELECT Customer_ID FROM Customers WHERE Account_Number = '55667100111223344'), -- Customer: Delta Wholesalers
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001),
+  'Walk-in',
+  (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'Closed - Lost'), -- Status: Closed - Lost
+  (SELECT User_ID FROM Users WHERE Username = 'Saqib'),
+  CURRENT TIMESTAMP - 6 DAYS,
+  CURRENT TIMESTAMP - 5 DAYS,
+  (SELECT Remarks_ID FROM CloseRemarksLookup WHERE Remarks = 'Not Interested'), -- Remarks: Not Interested
+  'Customer decided to stay with their current bank due to existing relationship.', -- Closed_Reasoning
+  'Final follow-up call confirmed decision.',
+  NULL, NULL); -- No account opened
+
+-- Populate Activities Table
+INSERT INTO Activities (Lead_ID, Activity_DateTime, Activity, Action_Result, New_Lead_Status, Next_Action_ID, Next_Follow_Up_DateTime, Comment_Details, Created_Date) VALUES
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '12345001123456789')), -- Lead for Alpha Trading
+  CURRENT TIMESTAMP - 4 DAYS, 'Initial Call', 'Meeting Scheduled', 'In Progress', (SELECT Next_Action_ID FROM NextActionLookup WHERE Next_Action_Name = 'Schedule Meeting'), CURRENT TIMESTAMP + 3 DAYS, 'Scheduled meeting for next week.', CURRENT TIMESTAMP - 4 DAYS),
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '12345001123456789')), -- Lead for Alpha Trading
+  CURRENT TIMESTAMP - 1 DAYS, 'Meeting Held & Proposal Sent', 'Awaiting Feedback', 'Follow-up Required', (SELECT Next_Action_ID FROM NextActionLookup WHERE Next_Action_Name = 'Call Customer'), CURRENT TIMESTAMP + 7 DAYS, 'Sent detailed proposal for trade finance via email.', CURRENT TIMESTAMP - 1 DAYS),
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '98765001987654321')), -- Lead for Beta Manufacturing
+  CURRENT TIMESTAMP - 7 DAYS, 'Initial Call Attempt', 'No Answer', 'New', (SELECT Next_Action_ID FROM NextActionLookup WHERE Next_Action_Name = 'Call Customer'), CURRENT TIMESTAMP - 6 DAYS, 'Will try calling again.', CURRENT TIMESTAMP - 7 DAYS),
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '98765001987654321')), -- Lead for Beta Manufacturing
+  CURRENT TIMESTAMP - 6 DAYS, 'Second Call & Meeting Scheduled', 'Meeting Scheduled', 'In Progress', (SELECT Next_Action_ID FROM NextActionLookup WHERE Next_Action_Name = 'Internal Follow-up'), CURRENT TIMESTAMP + 1 DAYS, 'Meeting set for tomorrow.', CURRENT TIMESTAMP - 6 DAYS),
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '55667100111223344')), -- Lead for Delta Wholesalers
+  CURRENT TIMESTAMP - 5 DAYS, 'Initial Meeting', 'Discussed Products', 'In Progress', (SELECT Next_Action_ID FROM NextActionLookup WHERE Next_Action_Name = 'Call Customer'), CURRENT TIMESTAMP - 3 DAYS, 'Customer seemed interested, needs follow up.', CURRENT TIMESTAMP - 5 DAYS),
+( (SELECT Lead_ID FROM Leads WHERE Customer_ID = (SELECT Customer_ID FROM Customers WHERE Account_Number = '55667100111223344')), -- Lead for Delta Wholesalers (Closing Activity)
+  CURRENT TIMESTAMP - 2 DAYS, 'Follow-up Call', 'Customer Not Interested', 'Closed - Lost', NULL, NULL, 'Customer confirmed they will stay with current bank. Reasoning captured in Leads table.', CURRENT TIMESTAMP - 2 DAYS); -- Note: Reasoning text itself is in Leads.Closed_Reasoning
+
+-- Populate Reports Table
+INSERT INTO Reports (User_ID, Report_Name, Report_Type, Report_Parameters, Generated_Date_Time, File_Path, File_Format) VALUES
+((SELECT User_ID FROM Users WHERE Username = 'Jari'), 'Customer Visit Report - Alpha', 'PDF', 'Customer=Alpha', CURRENT TIMESTAMP, '/files/report_alpha.pdf', 'PDF'),
+((SELECT User_ID FROM Users WHERE Username = 'Jari'), 'Customer Visit Report - Gamma', 'Excel', 'Customer=Gamma', CURRENT TIMESTAMP, '/files/report_gamma.xlsx', 'Excel'),
+((SELECT User_ID FROM Users WHERE Username = 'Basit'), 'Lead Status Report - In Progress', 'PDF','Status=InProgress', CURRENT TIMESTAMP, '/files/report_leads_inprogress.pdf', 'PDF'),
+((SELECT User_ID FROM Users WHERE Username = 'Ahmed'), 'Overall Lead Summary Report', 'Excel', 'All', CURRENT TIMESTAMP, '/files/report_overall.xlsx', 'Excel');
 
 
 ---------------------------------- Select ----------------------------------
 
-
--- Retrieve Users Table Data
-SELECT * FROM Users;
-
--- Retrieve Branch Table Data
+-- Retrieve Core Table Data
 SELECT * FROM Branches;
-
--- Retrieve Reports Table Data
+SELECT * FROM Roles;
+SELECT * FROM Users;
+SELECT * FROM Accounts;
+SELECT * FROM Customers;
+SELECT * FROM Leads;
+SELECT * FROM Activities;
 SELECT * FROM Reports;
 
--- Retrieve Roles Table Data
-SELECT * FROM Roles;
+-- Retrieve Supporting LOV Table Data
+SELECT * FROM CustomerTypeofBusiness;
+SELECT * FROM CustomerType;
+SELECT * FROM CustomerCategory;
+SELECT * FROM VisitPurpose;
+SELECT * FROM PersonVisitingFromBank;
+SELECT * FROM CustomerClassification;
 
--- Retrieve Customers Table Data
-SELECT * FROM Customers;
-
--- Retrieve Leads Table Data
-SELECT * FROM Leads;
-
--- Retrieve Activities Table Data
-SELECT * FROM Activities;
-
--- Retrieve Lookup Table Data
-SELECT * FROM NextActionLookup;
+-- Retrieve Lead/Activity Lookup Table Data
 SELECT * FROM CloseRemarksLookup;
 SELECT * FROM LeadStatusLookup;
-
-
+SELECT * FROM NextActionLookup;
