@@ -5,7 +5,8 @@ CREATE TABLE Branches (
     Branch_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Branch_Name VARCHAR(100) NOT NULL,
     Branch_Code INT NOT NULL UNIQUE,
-    Location VARCHAR(255) NOT NULL
+    Location VARCHAR(255) NOT NULL,
+    CONSTRAINT chk_branch_code_length CHECK (Branch_Code BETWEEN 1000 AND 9999)
 );
 
 -- Create Roles Table
@@ -42,7 +43,7 @@ CREATE TABLE Reports (
 
 -- Create Accounts Table
 CREATE TABLE Accounts (
-    Account_Number VARCHAR(20) PRIMARY KEY NOT NULL,
+    Account_Number VARCHAR(17) PRIMARY KEY NOT NULL,
     Account_Title VARCHAR(255) NOT NULL,
     CONSTRAINT chk_account_number_length CHECK (LENGTH(Account_Number) = 17)
 );
@@ -83,8 +84,8 @@ CREATE TABLE CustomerClassification (
 CREATE TABLE Customers (
     Customer_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Customer_Name VARCHAR(100) NOT NULL,
-    Account_Number VARCHAR(20), 
-    Contact_Number VARCHAR(21) NOT NULL,
+    Account_Number VARCHAR(17), 
+    Contact_Number VARCHAR(11) NOT NULL,
     Address VARCHAR(255) NOT NULL,
     Created_Date TIMESTAMP NOT NULL,
     TypeofBusiness_ID INT NOT NULL,
@@ -111,7 +112,8 @@ CREATE TABLE Customers (
     FOREIGN KEY (Category_ID) REFERENCES CustomerCategory(Category_ID),
     FOREIGN KEY (Purpose_ID) REFERENCES VisitPurpose(Purpose_ID),
     FOREIGN KEY (Person_ID) REFERENCES PersonVisitingFromBank(Person_ID),
-    FOREIGN KEY (Classification_ID) REFERENCES CustomerClassification(Classification_ID)
+    FOREIGN KEY (Classification_ID) REFERENCES CustomerClassification(Classification_ID),
+    CONSTRAINT chk_contact_number_length CHECK (LENGTH(Contact_Number) = 11)
 );
 
 -- Create Supporting Lookup Tables for Leads and Activities
@@ -144,13 +146,15 @@ CREATE TABLE Leads (
     Remarks_ID INT,
     Closed_Reasoning VARCHAR(255),
     Comment_Details VARCHAR(255),
-    Opened_Account_Number VARCHAR(20), 
+    Opened_Account_Number VARCHAR(17), 
     Opened_Account_Title VARCHAR(100), 
     FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
     FOREIGN KEY (Branch_ID) REFERENCES Branches(Branch_ID),
     FOREIGN KEY (User_ID) REFERENCES Users(User_ID),
     FOREIGN KEY (Status_ID) REFERENCES LeadStatusLookup(Status_ID),
-    FOREIGN KEY (Remarks_ID) REFERENCES CloseRemarksLookup(Remarks_ID)
+    FOREIGN KEY (Remarks_ID) REFERENCES CloseRemarksLookup(Remarks_ID),
+    FOREIGN KEY (Opened_Account_Title) REFERENCES Accounts(Account_Number),
+    CONSTRAINT chk_opened_account_number_length CHECK (LENGTH(Opened_Account_Number) = 17)
 );
 
 -- Create Activities Table
@@ -239,10 +243,10 @@ INSERT INTO NextActionLookup (Next_Action_Name) VALUES
 
 -- Populate Customers Table 
 INSERT INTO Customers (Customer_Name, Account_Number, Contact_Number, Address, Created_Date, TypeofBusiness_ID, CustomerType_ID, Industry_Sector, Category_ID, Purpose_ID, Key_Persons_met, Person_ID, Date_Time_of_Visit, Customer_Currently_Banking_with, Nature_of_Facilities_with_other_Banks, Address_of_Premises_Visited, Classification_ID, Next_Visit_Assigned_Department, Next_Visit_Assigned_Department_s_Official_Name, Key_Supplier, Key_Buyers, Personal_Leads, Visit_Summary) VALUES
-('Alpha Trading Co.', '12345001123456789', '0300-1234567', '123 Main St, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Local Trader'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'SME - ETB'), 'Textiles', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Partnership'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'To Enhance Business'), 'Mr. Usman (CEO)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Area Manager & Branch Manager'), CURRENT TIMESTAMP - 10 DAYS, 'Bank XYZ', 'Running Finance', '123 Main St, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing, Trade'), 'SME', 'Area Manager SME', 'Supplier A', 'Buyer X', 'Lead from Conf. A', 'Discussed potential trade facility enhancement. Positive outlook.'),
-('Beta Manufacturing Inc.', '98765001987654321', '0321-9876543', '456 Industrial Zone, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Manufacturer'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - ETB'), 'Pharmaceuticals', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Follow-up meeting'), 'Ms. Aisha (Director)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & Relationship Manager'), CURRENT TIMESTAMP - 12 DAYS, 'Bank ABC', 'Term Loan', '456 Industrial Zone, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit, Financing, Trade'), 'Corporate', 'Relationship Manager Corp', 'Supplier B', 'Buyer Y', 'Referral from Client B', NULL),
-('Gamma Services Ltd.', '11223786112233445', '0333-1122334', '789 Business Ave, Clifton', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Services'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Corporate - ETB'), 'IT Services', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Customer Request'), 'Mr. Bilal (Owner)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager'), CURRENT TIMESTAMP - 13 DAYS, 'Bank DEF', 'None', '789 Business Ave, Clifton', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit'), 'Retail', 'Branch Manager', 'Supplier C', 'Buyer Z', 'Internal Lead Gen', 'Initial meeting request fulfilled. Explored deposit products.'),
-('Delta Wholesalers', '55667100111223344', '0311-5556677', '10 Warehouse Ln, SITE Area', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Wholesaler'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - NTB'), 'General Goods', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Sole Proprietor'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Courtesy Call'), 'Mr. Dawood (Proprietor)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & BDO'), CURRENT TIMESTAMP - 15 DAYS, 'Bank GHI', 'Cash Finance', '10 Warehouse Ln, SITE Area', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing'), 'Commercial', 'RM Commercial', 'Supplier D', 'Buyer W', 'Walk-in', 'Met proprietor, initial discussion.');
+('Alpha Trading Co.', '12345001123456789', '03001234567', '123 Main St, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Local Trader'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'SME - ETB'), 'Textiles', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Partnership'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'To Enhance Business'), 'Mr. Usman (CEO)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Area Manager & Branch Manager'), CURRENT TIMESTAMP - 10 DAYS, 'Bank XYZ', 'Running Finance', '123 Main St, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing, Trade'), 'SME', 'Area Manager SME', 'Supplier A', 'Buyer X', 'Lead from Conf. A', 'Discussed potential trade facility enhancement. Positive outlook.'),
+('Beta Manufacturing Inc.', '98765001987654321', '03219876543', '456 Industrial Zone, Karachi', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Manufacturer'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - ETB'), 'Pharmaceuticals', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Follow-up meeting'), 'Ms. Aisha (Director)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & Relationship Manager'), CURRENT TIMESTAMP - 12 DAYS, 'Bank ABC', 'Term Loan', '456 Industrial Zone, Karachi', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit, Financing, Trade'), 'Corporate', 'Relationship Manager Corp', 'Supplier B', 'Buyer Y', 'Referral from Client B', NULL),
+('Gamma Services Ltd.', '11223786112233445', '03331122334', '789 Business Ave, Clifton', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Services'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Corporate - ETB'), 'IT Services', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Company'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Customer Request'), 'Mr. Bilal (Owner)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager'), CURRENT TIMESTAMP - 13 DAYS, 'Bank DEF', 'None', '789 Business Ave, Clifton', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Deposit'), 'Retail', 'Branch Manager', 'Supplier C', 'Buyer Z', 'Internal Lead Gen', 'Initial meeting request fulfilled. Explored deposit products.'),
+('Delta Wholesalers', '55667100111223344', '03115556677', '10 Warehouse Ln, SITE Area', CURRENT TIMESTAMP, (SELECT TypeofBusiness_ID FROM CustomerTypeofBusiness WHERE TypeofBusiness_Value = 'Wholesaler'), (SELECT CustomerType_ID FROM CustomerType WHERE CustomerType_Value = 'Commercial - NTB'), 'General Goods', (SELECT Category_ID FROM CustomerCategory WHERE Category_Value = 'Sole Proprietor'), (SELECT Purpose_ID FROM VisitPurpose WHERE Purpose_Value = 'Courtesy Call'), 'Mr. Dawood (Proprietor)', (SELECT Person_ID FROM PersonVisitingFromBank WHERE Person_Value = 'Branch Manager & BDO'), CURRENT TIMESTAMP - 15 DAYS, 'Bank GHI', 'Cash Finance', '10 Warehouse Ln, SITE Area', (SELECT Classification_ID FROM CustomerClassification WHERE Classification_Value = 'Financing'), 'Commercial', 'RM Commercial', 'Supplier D', 'Buyer W', 'Walk-in', 'Met proprietor, initial discussion.');
 
 -- Populate Leads Table
 INSERT INTO Leads (Customer_ID, Branch_ID, Lead_Avenue, Status_ID, User_ID, Created_Date, Submitted_Date, Remarks_ID, Closed_Reasoning, Comment_Details, Opened_Account_Number, Opened_Account_Title) VALUES
