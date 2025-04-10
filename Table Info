@@ -1,0 +1,37 @@
+Okay, let's break down how the Customers, Leads, and Activities tables work together in the flow described by the user story:
+
+Think of it like this:
+
+Customers Table: The "Who"
+
+Purpose: This table stores detailed, relatively static information about the business or individual you are dealing with. It's like a profile or dossier.
+How it's used: When a Branch User generates a new lead, they fill out the extensive customer information section. This data (Customer Name, Address, Contact Number, Type of Business, Industry Sector, Persons Met, Banking relationships, etc.) is saved into the Customers table. If it's an existing bank customer (ETB), some basic info might already exist or be linked via the Account_Number. This table holds the core details about the customer entity itself.   
+
+Leads Table: The "What" (Opportunity)
+
+Purpose: This table represents a specific sales opportunity or potential deal related to a customer. A single customer might have multiple leads over time (though perhaps only one active lead at a time, depending on business rules).
+How it's used: When the Branch User saves or submits the customer information during lead generation, a new record is created in the Leads table. This record:
+Links to the relevant Customer_ID from the Customers table.
+Assigns the lead to a specific Branch_ID and User_ID (the Branch User responsible).
+Tracks the overall Status_ID of the opportunity (e.g., New, In Progress, Closed - Won, Closed - Lost).
+Records how the lead originated (Lead_Avenue).
+Captures details specific to closing the lead, like the Remarks_ID (if closed) or the Opened_Account_Number (if converted to a client).   
+Essentially, the Leads table turns a customer profile (Customers) into an actionable sales item being tracked by the bank.
+
+Activities Table: The "How" (Actions/History)
+
+Purpose: This table records every interaction, action, or step taken specifically for one lead. It provides the chronological history of what has happened with that sales opportunity.
+How it's used: Whenever a Branch User interacts with a lead (makes a call, holds a meeting, sends an email), they log an activity. This creates a new record in the Activities table, which:
+Links back to the specific Lead_ID it relates to.
+Records the Activity_DateTime, what the Activity was, and the Action_Result.
+May update the lead's overall status (New_Lead_Status - though the main status is in the Leads table, this might record the status after the activity).
+Crucially, it helps plan the next step: it stores the Next_Action_ID and Next_Follow_Up_DateTime.   
+Includes Comment_Details about that specific interaction.
+  
+This table gives you the detailed journey and progress tracking for each individual lead listed in the Leads table.
+
+In simple terms:
+
+You gather information about a Customer.
+You create a Lead to track a specific sales opportunity with that Customer.
+You record multiple Activities against that Lead to show how you are working on it and what the next steps are.
