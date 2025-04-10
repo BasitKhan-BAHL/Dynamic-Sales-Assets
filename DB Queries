@@ -1,0 +1,293 @@
+---------------------------------- Create ----------------------------------
+
+-- Create Branches Table
+CREATE TABLE Branches (
+    Branch_ID INT PRIMARY KEY NOT NULL,
+    Branch_Name VARCHAR(100),
+    Branch_Code INT,
+    Location VARCHAR(255)
+);
+
+-- Create Roles Table
+CREATE TABLE Roles (
+    Role_ID INT PRIMARY KEY NOT NULL,
+    Role VARCHAR(50)
+);
+
+-- Create Users Table
+CREATE TABLE Users (
+    User_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    Username VARCHAR(50),
+    Role_ID INT,
+    Branch_ID INT,
+    Password_Hash VARCHAR(255),
+    Created_Date TIMESTAMP,
+    Last_Login TIMESTAMP,
+    PRIMARY KEY (User_ID),
+    FOREIGN KEY (Role_ID) REFERENCES Roles(Role_ID),
+    FOREIGN KEY (Branch_ID) REFERENCES Branches(Branch_ID)
+);
+
+-- Create Reports Table
+CREATE TABLE Reports (
+    Report_ID INT PRIMARY KEY NOT NULL,
+    User_ID INT,
+    Report_Name VARCHAR(255),
+    Report_Type VARCHAR(255),
+    Report_Parameters VARCHAR(255),
+    Generated_Date_Time TIMESTAMP,
+    File_Path VARCHAR(255),
+    File_Format VARCHAR(255),
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+);
+
+-- Create Accounts Table
+CREATE TABLE Accounts (
+    Account_Number VARCHAR(20) PRIMARY KEY NOT NULL,
+    Account_Title VARCHAR(255)
+);
+
+-- Create Supporting LOV Tables
+CREATE TABLE CustomerTypeofBusiness (
+    TypeofBusiness_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    TypeofBusiness_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE CustomerType (
+    CustomerType_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    CustomerType_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE CustomerCategory (
+    Category_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Category_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE VisitPurpose (
+    Purpose_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Purpose_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE PersonVisitingFromBank (
+    Person_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Person_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE CustomerClassification (
+    Classification_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    Classification_Value VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Create Customers Table
+CREATE TABLE Customers (
+    Customer_ID INT PRIMARY KEY NOT NULL,
+    Customer_Name VARCHAR(100),
+    Account_Number VARCHAR(20),
+    Contact_Number VARCHAR(21),
+    Address VARCHAR(255),
+    Created_Date TIMESTAMP,
+    TypeofBusiness_ID INT,
+    CustomerType_ID INT,
+    Industry_Sector VARCHAR(100),
+    Category_ID INT,
+    Purpose_ID INT,
+    Key_Persons_met VARCHAR(250),
+    Person_ID INT,
+    Date_Time_of_Visit TIMESTAMP,
+    Customer_Currently_Banking_with VARCHAR(100),
+    Nature_of_Facilities_with_other_Banks VARCHAR(100),
+    Address_of_Premises_Visited VARCHAR(250),
+    Classification_ID INT,
+    Next_Visit_Assigned_Department VARCHAR(100),
+    Next_Visit_Assigned_Department_s_Official_Name VARCHAR(100),
+    Key_Supplier VARCHAR(250),
+    Key_Buyers VARCHAR(250),
+    Personal_Leads VARCHAR(250),
+    FOREIGN KEY (Account_Number) REFERENCES Accounts(Account_Number),
+    FOREIGN KEY (TypeofBusiness_ID) REFERENCES CustomerTypeofBusiness(TypeofBusiness_ID),
+    FOREIGN KEY (CustomerType_ID) REFERENCES CustomerType(CustomerType_ID),
+    FOREIGN KEY (Category_ID) REFERENCES CustomerCategory(Category_ID),
+    FOREIGN KEY (Purpose_ID) REFERENCES VisitPurpose(Purpose_ID),
+    FOREIGN KEY (Person_ID) REFERENCES PersonVisitingFromBank(Person_ID),
+    FOREIGN KEY (Classification_ID) REFERENCES CustomerClassification(Classification_ID)
+);
+
+-- Create Supporting Lookup Tables for Leads and Activities
+CREATE TABLE CloseRemarksLookup (
+    Remarks_ID INT PRIMARY KEY NOT NULL,
+    Remarks VARCHAR(255)
+);
+
+CREATE TABLE LeadStatusLookup (
+    Status_ID INT PRIMARY KEY NOT NULL,
+    Status_Name VARCHAR(255)
+);
+
+CREATE TABLE NextActionLookup (
+    Next_Action_ID INT PRIMARY KEY NOT NULL,
+    Next_Action_Name VARCHAR(255)
+);
+
+CREATE TABLE Leads (
+    Lead_ID INT PRIMARY KEY NOT NULL,
+    Customer_ID INT,
+    Branch_ID INT,
+    Lead_Avenue VARCHAR(50),
+    Status_ID INT,
+    User_ID INT,
+    Created_Date TIMESTAMP,
+    Submitted_Date TIMESTAMP,
+    Remarks_ID INT,
+    Comment_Details VARCHAR(255),
+    Opened_Account_Number VARCHAR(20),
+    Opened_Account_Title VARCHAR(100),
+    FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
+    FOREIGN KEY (Branch_ID) REFERENCES Branches(Branch_ID),
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID),
+    FOREIGN KEY (Status_ID) REFERENCES LeadStatusLookup(Status_ID),
+    FOREIGN KEY (Remarks_ID) REFERENCES CloseRemarksLookup(Remarks_ID)
+);
+
+CREATE TABLE Activities (
+    Activity_ID INT PRIMARY KEY NOT NULL,
+    Lead_ID INT,
+    Activity_DateTime TIMESTAMP,
+    Activity VARCHAR(255),
+    Action_Result VARCHAR(100),
+    New_Lead_Status VARCHAR(50),
+    Next_Action_ID INT,
+    Next_Follow_Up_DateTime TIMESTAMP,
+    Comment_Details VARCHAR(255),
+    Created_Date TIMESTAMP,
+    FOREIGN KEY (Lead_ID) REFERENCES Leads(Lead_ID),
+    FOREIGN KEY (Next_Action_ID) REFERENCES NextActionLookup(Next_Action_ID)
+);
+
+
+---------------------------------- Insert ----------------------------------
+
+
+-- Populate Branches Table
+INSERT INTO Branches (Branch_ID, Branch_Name, Branch_Code, Location) VALUES
+(5001, 'Shahrah-e-Faisal Islamic', 5001, 'Shahrah-e-Faisal'),
+(786, 'Karachi Main', 786, 'I.I Chundrigar'),
+(1001, 'North Islamic Branch', 1001, 'North Nazimabad'),
+(2001, 'Help Desk', 2001, 'CenterPoint');
+
+-- Populate Roles Table
+INSERT INTO Roles (Role_ID, Role) VALUES 
+(1, 'Branch User'),
+(2, 'Help Desk');
+
+-- Populate Users Table
+INSERT INTO Users (Username, Role_ID, Branch_ID, Password_Hash, Created_Date, Last_Login) VALUES
+('Jari', 1, 5001, 'hashed_password_1', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Basit', 1, 786, 'hashed_password_2', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Ahmed', 2, 2001, 'hashed_password_3', CURRENT TIMESTAMP, CURRENT TIMESTAMP);
+
+INSERT INTO Users (Username, Role_ID, Branch_ID, Password_Hash, Created_Date, Last_Login) VALUES
+('Saqib', 1, 5001, '$2a$10$cG9cwRNnaHMRcculaHQ67ea0iPd9FmRCDl2NmmlkLQAIFV8OzOLfG', CURRENT TIMESTAMP, CURRENT TIMESTAMP)
+
+-- Populate Reports Table
+INSERT INTO Reports (Report_ID, User_ID, Report_Name, Report_Type, Report_Parameters, Generated_Date_Time, File_Path, File_Format)
+VALUES (61, 10, 'Customer Visit Report', 'PDF', 'Param1', CURRENT TIMESTAMP, '/files/report1.pdf', 'PDF'),
+       (62, 10, 'Customer Visit Report', 'Excel', 'Param2', CURRENT TIMESTAMP, '/files/report2.xlsx', 'Excel'),
+       (63, 30, 'Customer Visit Report', 'PDF','Param3', CURRENT TIMESTAMP, '/files/report3.csv', 'PDF');
+
+-- Populate Lookup Tables
+INSERT INTO CustomerTypeofBusiness (TypeofBusiness_Value) VALUES
+('Wholesaler'),
+('Manufacturer'),
+('Local Trader'),
+('Foreign Trader - Importer'),
+('Foreign Trader - Exporter'),
+('Retailer'),
+('Services'),
+('Other');
+
+INSERT INTO CustomerType (CustomerType_Value) VALUES
+('Retail - NTB'),
+('SME - NTB'),
+('Commercial - NTB'),
+('Corporate - NTB'),
+('Retail - ETB'),
+('SME - ETB'),
+('Commercial - ETB'),
+('Corporate - ETB');
+
+INSERT INTO CustomerCategory (Category_Value) VALUES
+('Individual'),
+('Sole Proprietor'),
+('Partnership'),
+('Company'),
+('Other');
+
+INSERT INTO VisitPurpose (Purpose_Value) VALUES
+('Customer Request'),
+('To Enhance Business'),
+('Courtesy Call'),
+('Follow-up meeting'),
+('Meeting with senior executives');
+
+INSERT INTO PersonVisitingFromBank (Person_Value) VALUES
+('Zonal Head'),
+('Zonal Head & Area Chief'),
+('Zonal Head, Area Chief & Area Manager'),
+('Zonal Head & Area Manager'),
+('Zonal Head & Area Manager, Credit'),
+('Zonal Head & Area Manager, Trade'),
+('Zonal Head, Area Chief, Area Manager & Branch Manager'),
+('Zonal Head, Area Manager & Branch Manager'),
+('Area Manager & Branch Manager'),
+('Branch Manager & Credit'),
+('Branch Manager & Trade'),
+('Branch Manager & Leasing'),
+('Branch Manager & Agriculture'),
+('Branch Manager & Consumer'),
+('Branch Manager & Cash Management'),
+('Branch Manager & Employee Banking'),
+('Branch Manager & Relationship Manager'),
+('Branch Manager, Relationship Manager & BDO'),
+('Branch Manager & BDO'),
+('Branch Manager');
+
+INSERT INTO CustomerClassification (Classification_Value) VALUES
+('Deposit'),
+('Financing'),
+('Trade'),
+('Deposit, Financing'),
+('Deposit, Financing, Trade'),
+('Financing, Trade'),
+('Deposit, Trade');
+
+
+---------------------------------- Select ----------------------------------
+
+
+-- Retrieve Users Table Data
+SELECT * FROM Users;
+
+-- Retrieve Branch Table Data
+SELECT * FROM Branches;
+
+-- Retrieve Reports Table Data
+SELECT * FROM Reports;
+
+-- Retrieve Roles Table Data
+SELECT * FROM Roles;
+
+-- Retrieve Customers Table Data
+SELECT * FROM Customers;
+
+-- Retrieve Leads Table Data
+SELECT * FROM Leads;
+
+-- Retrieve Activities Table Data
+SELECT * FROM Activities;
+
+-- Retrieve Lookup Table Data
+SELECT * FROM NextActionLookup;
+SELECT * FROM CloseRemarksLookup;
+SELECT * FROM LeadStatusLookup;
+
+
