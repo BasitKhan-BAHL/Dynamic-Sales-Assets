@@ -4,9 +4,9 @@
 CREATE TABLE Branches (
     Branch_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Branch_Name VARCHAR(100) NOT NULL,
-    Branch_Code INT NOT NULL UNIQUE,
+    Branch_Code CHAR(4) NOT NULL UNIQUE,
     Location VARCHAR(255) NOT NULL,
-    CONSTRAINT chk_branch_code_length CHECK (Branch_Code BETWEEN 1000 AND 9999)
+    CONSTRAINT chk_branch_code_format CHECK (Branch_Code LIKE '[0-9][0-9][0-9][0-9]')
 );
 
 -- Create Roles Table
@@ -178,10 +178,10 @@ CREATE TABLE Activities (
 
 -- Populate Branches Table
 INSERT INTO Branches (Branch_Name, Branch_Code, Location) VALUES
-('Shahrah-e-Faisal Islamic', 5001, 'Shahrah-e-Faisal'),
-('Karachi Main', 7860, 'I.I Chundrigar'),
-('North Islamic Branch', 1001, 'North Nazimabad'),
-('CenterPoint', 2001, 'Shaheed-e-Millat Expressway');
+('Shahrah-e-Faisal Islamic', '5001', 'Shahrah-e-Faisal'),
+('Karachi Main', '7860', 'I.I Chundrigar'),
+('North Islamic Branch', '1001', 'North Nazimabad'),
+('CenterPoint', '2001', 'Shaheed-e-Millat Expressway');
 
 -- Populate Roles Table
 INSERT INTO Roles (Role) VALUES
@@ -190,10 +190,10 @@ INSERT INTO Roles (Role) VALUES
 
 -- Populate Users Table
 INSERT INTO Users (Username, Role_ID, Branch_ID, Password_Hash, Created_Date, Last_Login) VALUES
-('Jari', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001), 'hashed_password_1', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
-('Basit', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 7860), 'hashed_password_2', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
-('Ahmed', (SELECT Role_ID FROM Roles WHERE Role = 'Help Desk'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 2001), 'hashed_password_3', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
-('Saqib', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001), '$2a$10$cG9cwRNnaHMRcculaHQ67ea0iPd9FmRCDl2NmmlkLQAIFV8OzOLfG', CURRENT TIMESTAMP, CURRENT TIMESTAMP);
+('Jari', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = '5001'), 'hashed_password_1', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Basit', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = '7860'), 'hashed_password_2', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Ahmed', (SELECT Role_ID FROM Roles WHERE Role = 'Help Desk'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = '2001'), 'hashed_password_3', CURRENT TIMESTAMP, CURRENT TIMESTAMP),
+('Saqib', (SELECT Role_ID FROM Roles WHERE Role = 'Branch User'), (SELECT Branch_ID FROM Branches WHERE Branch_Code = '5001'), '$2a$10$cG9cwRNnaHMRcculaHQ67ea0iPd9FmRCDl2NmmlkLQAIFV8OzOLfG', CURRENT TIMESTAMP, CURRENT TIMESTAMP);
 
 -- Populate Accounts Table
 INSERT INTO Accounts (Account_Number, Account_Title) VALUES
@@ -251,7 +251,7 @@ INSERT INTO Customers (Customer_Name, Account_Number, Contact_Number, Address, C
 -- Populate Leads Table
 INSERT INTO Leads (Customer_ID, Branch_ID, Lead_Avenue, Status_ID, User_ID, Created_Date, Submitted_Date, Remarks_ID, Closed_Reasoning, Comment_Details, Opened_Account_Number, Opened_Account_Title) VALUES
 ( (SELECT Customer_ID FROM Customers WHERE Account_Number = '12345001123456789'), -- Customer: Alpha Trading
-  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001),
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = '5001'),
   'Referral',
   (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'Follow-up Required'), -- Status: Follow-up Required
   (SELECT User_ID FROM Users WHERE Username = 'Jari'),
@@ -262,7 +262,7 @@ INSERT INTO Leads (Customer_ID, Branch_ID, Lead_Avenue, Status_ID, User_ID, Crea
   'Proposal sent, awaiting feedback.',
   NULL, NULL),
 ( (SELECT Customer_ID FROM Customers WHERE Account_Number = '98765001987654321'), -- Customer: Beta Manufacturing
-  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 7860),
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = '7860'),
   'Cold Call',
   (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'In Progress'), -- Status: In Progress
   (SELECT User_ID FROM Users WHERE Username = 'Basit'),
@@ -273,7 +273,7 @@ INSERT INTO Leads (Customer_ID, Branch_ID, Lead_Avenue, Status_ID, User_ID, Crea
   'Meeting held, evaluating requirements.',
   NULL, NULL),
 ( (SELECT Customer_ID FROM Customers WHERE Account_Number = '55667100111223344'), -- Customer: Delta Wholesalers
-  (SELECT Branch_ID FROM Branches WHERE Branch_Code = 5001),
+  (SELECT Branch_ID FROM Branches WHERE Branch_Code = '5001'),
   'Walk-in',
   (SELECT Status_ID FROM LeadStatusLookup WHERE Status_Name = 'Closed - Lost'), -- Status: Closed - Lost
   (SELECT User_ID FROM Users WHERE Username = 'Saqib'),
@@ -331,4 +331,3 @@ SELECT * FROM CustomerClassification;
 SELECT * FROM CloseRemarksLookup;
 SELECT * FROM LeadStatusLookup;
 SELECT * FROM NextActionLookup;
-
