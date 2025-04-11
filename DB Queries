@@ -4,9 +4,9 @@
 CREATE TABLE Branches (
     Branch_ID INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
     Branch_Name VARCHAR(100) NOT NULL,
-    Branch_Code CHAR(4) NOT NULL UNIQUE,
+    Branch_Code VARCHAR(4) NOT NULL UNIQUE,
     Location VARCHAR(255) NOT NULL,
-    CONSTRAINT chk_branch_code_format CHECK (Branch_Code LIKE '[0-9][0-9][0-9][0-9]')
+    CONSTRAINT chk_branch_code_length CHECK (LENGTH(Branch_Code) = 4)
 );
 
 -- Create Roles Table
